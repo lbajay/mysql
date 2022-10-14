@@ -1,0 +1,22 @@
+CREATE PROCEDURE `getallcat`(IN `slugdata` VARCHAR(100))
+BEGIN
+
+SET @SQL = concat('WITH RECURSIVE ALLCATWITHCHILD AS
+(
+  SELECT    id,
+            slug,
+            parent_id
+  FROM categories
+  WHERE slug ="',slugdata,'" and is_active=1
+  UNION ALL
+  SELECT   c.id,
+            c.slug,
+            c.parent_id
+FROM categories c INNER JOIN ALLCATWITHCHILD ch ON c.parent_id=ch.id  where c.is_active=1
+) SELECT  slug
+FROM ALLCATWITHCHILD');
+
+PREPARE stmt FROM @SQL;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+END
